@@ -16,6 +16,7 @@ import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbManager;
 import android.hardware.usb.UsbRequest;
+import android.os.PowerManager;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -44,6 +45,17 @@ public class main extends Activity implements Runnable
     int tMAx=0;
     private static EditText tMaxText;
 
+    /* variables algoritmo de control de temperatura;
+     */
+    public static final int GRADOS_MAXIMOS = 180;//grados maximos del servo = 220 volts.
+    public static final int GRADOS_MINIMOS = 0;//grados minimos del servo = 0 volts.
+    public static int delay= 30;//segundo de espera para continuar con el algoritmo
+    public int grados_motor=0;// informacion que se le enviara al arduino para controlar el voltaje conforme
+                                //a la medicion de temperatura.
+
+
+
+
 
     // Crear un par de conjuntos de valores de y para trazar:
 
@@ -61,9 +73,14 @@ public class main extends Activity implements Runnable
     private LineGraph line = new LineGraph();
     private static Thread thread;
 
+    protected PowerManager.WakeLock wakelock;
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
@@ -91,8 +108,18 @@ public class main extends Activity implements Runnable
 
         usbManager = (UsbManager)getSystemService(Context.USB_SERVICE);
 
+        final PowerManager pm=(PowerManager)getSystemService(Context.POWER_SERVICE);
+        this.wakelock=pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "etiqueta");
+        wakelock.acquire();
+
     }
 
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+
+        this.wakelock.release();
+    }
 
     @Override
     public void onResume() {
@@ -186,6 +213,7 @@ public class main extends Activity implements Runnable
             public void run()
             {
                 int tiempo = 1;
+                int grados=0;
                 while (true) {
                     try {
                         Thread.sleep(1000);
@@ -200,6 +228,8 @@ public class main extends Activity implements Runnable
                         Point p = MockData.getDataFromReceiver(tiempo,temperatura); // We got new data!
                         line.addNewPoints(p); // Add it to our graph
                         view.repaint();
+
+                        /*
                         if(temperatura> tMAx && !rele)
                         {
                             sendCommand(CMD_LED_OFF);
@@ -210,13 +240,18 @@ public class main extends Activity implements Runnable
                         {
                             sendCommand(tiempo);
                             rele= false;
-                        }
+                        }*/
 
 
                     }catch (Exception e){}
 
                     //servo motor
-                        sendCommand(tiempo);
+                    if(tiempo%120==0)
+                    {
+                        grados+=20;
+                        sendCommand(grados);
+                    }
+
 
 
                     tiempo++;
