@@ -55,6 +55,15 @@ public class main extends Activity implements Runnable
     public int grado_anterior=0;
     public int grado_ahora=180;
 
+    /*-----------
+
+     */
+    int valor;
+    int control;
+    double a,b,c;
+    double temp_limit;
+    double rT,eT,iT,dT,yT,uT,iT0,eT0;
+    double max,min;
 
 
 
@@ -93,7 +102,7 @@ public class main extends Activity implements Runnable
         texto = (TextView) findViewById(R.id.texto);
         prueba = (LinearLayout) findViewById(R.id.grafico);
 
-        tMaxText = (EditText) findViewById(R.id.tMax);
+       //tMaxText = (EditText) findViewById(R.id.tMax);
 
 
         view = line.getView(this);
@@ -111,7 +120,7 @@ public class main extends Activity implements Runnable
                 }
             }});
 
-        usbManager = (UsbManager)getSystemService(Context.USB_SERVICE);
+        usbManager = Comunicador.getUsbManager();
 
         final PowerManager pm=(PowerManager)getSystemService(Context.POWER_SERVICE);
         this.wakelock=pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "etiqueta");
@@ -218,78 +227,106 @@ public class main extends Activity implements Runnable
             public void run()
             {
                 int tiempo = 1;
+                int tiempo2= 0;
                 int grados=0;
+                boolean ty=true;
+                //---
+                min= 0;
+                max= 180;
+                iT0=  0.0;
+                eT0=  0.0;
+                a= 0.1243;
+                b=  0.0062;
+                c= 0.6215;
+                temp_limit= 70;
+                uT=1.0;
+                control=0;
+                int control_anterior=0;
+
+                int encendido_inicial= (int)temp_limit-15;
+                int rango_de_finalizacion=5;
+
                 while (true) {
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(500);
                         tMAx = Integer.parseInt(tMaxText.getText().toString());
-                        texto.setText("Temperatura: " + muestra + " grados C" + " MAX: " + tMAx +" grados: " + grado_ahora);
+                        // texto.setText("Temperatura: " + muestra + " grados C" + " MAX: " + tMAx +" grados: " + control + " grados 2: "+temperatura + "ut: "+uT);
 
 
                     } catch (Exception e) {
                     }
 
                     try {
-                        if(temperatura>=0)
+                        if(temperatura>=0 && tiempo%2==0)
                         {
-                            Point p = MockData.getDataFromReceiver(tiempo,temperatura); // We got new data!
+                            tiempo2++;
+                            Point p = MockData.getDataFromReceiver(tiempo2,temperatura); // We got new data!
                             line.addNewPoints(p); // Add it to our graph
                             view.repaint();
                         }
 
                     }catch (Exception e){}
 
-                    //servo motor
-                    /*funciona con esto asta el asd7.
-                    if(tiempo%120==0)
+
+                    if(temperatura<encendido_inicial)
                     {
-                        grados+=20;
-                        sendCommand(grados);
-                    }
-                     */
-
-                    /*
-                    algoritmo de control de temperatura.
-                     */
-                    int aux=0;
-                    if(tiempo%delay==0 && tiempo>1)
-                    {
-                        if(grado_anterior>grado_ahora)
-                        {
-                            aux= grado_anterior-grado_ahora;
-
-                        }
-                        else
-                        {
-                            aux=grado_ahora-grado_anterior;
-                        }
-                        aux= aux/2;
-
-                        if(temperatura < t_m_a_a)
-                        {
-                            aux=grado_ahora+aux;
-                        }
-                        else
-                        {
-                            if(temperatura>t_m_a_a)
-                            {
-                                aux=grado_ahora-aux;
-                            }
-                        }
-                        grado_anterior=grado_ahora;
-                        grado_ahora=aux;
-                        sendCommand(grado_ahora);
+                        sendCommand(180);
                     }
                     else
                     {
-                        if(tiempo==0)
+                        if(temperatura>=0&&temperatura<=200)
                         {
-                            sendCommand(grado_ahora);
+                            yT=(double)temperatura;
+                            rT=temp_limit-rango_de_finalizacion;
+                            eT=rT-yT;
+                            iT=b*eT+iT0;
+                            dT=c*(eT-eT0);
+                            uT=(a*eT)+dT+iT;
+                            //******Anti-Windup***************
+
+                            if(uT>max){
+                                uT=max;
+                            }
+                            else{
+                                if(uT<min){
+                                    uT=min;
+                                }
+                            }
+
+                            if(uT<30 && yT<(temp_limit-rango_de_finalizacion) && ty)
+                            {
+                                control=30;
+                            }
+                            else
+                            {
+                                ty=false;
+                                control= (int) uT;
+
+                            }
+
+                            if(!ty && temperatura>=temp_limit)
+                            {
+                                rango_de_finalizacion=0;
+                            }
+
+                            if(tiempo%2==0)
+                            {
+                                sendCommand(control);
+                            }
+                            control_anterior= (int) uT;
+                            iT0=iT;
+                            eT0=eT;
+
+                            try {
+                                texto.setText("Temperatura: " + temperatura + " grados C " +" ut: "+uT +" Control: "+control+
+                                        "tem-lim: "+ temp_limit);
+                            }catch (Exception e)
+                            {}
                         }
                     }
 
-
                     tiempo++;
+
                 }
             }
         };

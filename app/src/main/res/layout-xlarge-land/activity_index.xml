@@ -145,7 +145,7 @@
             </LinearLayout>
 
         </LinearLayout>
-
+        <View style="@style/Separator" />
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="294dp"

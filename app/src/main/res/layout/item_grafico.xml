@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tpi.tpi_autoclave.CheckedRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="fill_parent"
+android:layout_height="wrap_content"
+
+android:padding="8dp"
+android:background="@drawable/selector_filas">
+
+
+
+<!-- Nombre -->
+<TextView
+    android:id="@+id/textViewNombreRuta"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textSize="15dp"
+    android:textStyle="bold" />
+
+
+
+<!-- Puntos -->
+<TextView
+    android:id="@+id/textViewPuntos"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_below="@id/textViewNombreRuta"
+    android:layout_marginTop="5dp"
+    android:textSize="15dp"/>
+
+<!-- Distancia -->
+<TextView
+    android:id="@+id/textViewDistanciaTotal"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true"
+    android:layout_alignParentRight="true"
+    android:layout_marginRight="15dp"
+    android:textSize="10dp" />
+
+</tpi.tpi_autoclave.CheckedRelativeLayout>
+

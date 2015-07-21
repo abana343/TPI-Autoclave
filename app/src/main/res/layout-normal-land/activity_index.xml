@@ -82,17 +82,17 @@
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="10dp"
-                    android:layout_marginRight="5dp" />
+                    android:layout_marginRight="3dp" />
 
                 //entrada de texto robotino.
                 <EditText
-                    android:id="@+id/Tiempo"
-                    android:layout_width="fill_parent"
+                    android:layout_width="185dp"
                     android:layout_height="wrap_content"
-                    android:hint="Ingrese tiempo"
+                    android:hint="Ingrese temperatura"
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="30px"
                     android:gravity="center"
+                    android:layout_marginRight="0dp"
                     android:text="20" />
             </LinearLayout>
             <LinearLayout
@@ -111,16 +111,18 @@
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="10dp"
-                    android:layout_marginRight="20dp" />
+                    android:layout_marginRight="3dp" />
 
                 //entrada de texto robotino.
                 <EditText
                     android:id="@+id/Periodo"
-                    android:layout_width="fill_parent"
+                    android:layout_width="185dp"
                     android:layout_height="wrap_content"
-                    android:hint="Ingrese periodo"
+                    android:hint="Ingrese temperatura"
                     android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="30px"
                     android:gravity="center"
+                    android:layout_marginRight="0dp"
                     android:text="60" />
             </LinearLayout>
             <LinearLayout
@@ -143,7 +145,7 @@
             </LinearLayout>
 
         </LinearLayout>
-
+        <View style="@style/Separator" />
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="294dp"
