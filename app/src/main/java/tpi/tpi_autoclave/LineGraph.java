@@ -1,5 +1,4 @@
 package tpi.tpi_autoclave;
-
 import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;
 import org.achartengine.chart.PointStyle;
@@ -19,7 +18,10 @@ import android.webkit.WebSettings.TextSize;
 import static android.webkit.WebSettings.TextSize.NORMAL;
 
 
+
+
 public class LineGraph {
+
 
 
     private GraphicalView view;
@@ -31,7 +33,8 @@ public class LineGraph {
     private XYSeriesRenderer renderer = new XYSeriesRenderer(); // This will be used to customize line 1
     private XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer(); // Holds a collection of XYSeriesRenderer and customizes the graph
 
-    public LineGraph() {
+    public LineGraph()
+    {
         mDataset.addSeries(dataset);
 
         // Customization time for line 1!
@@ -49,7 +52,7 @@ public class LineGraph {
 
         // Enable Zoom
         mRenderer.setZoomButtonsVisible(false);
-        mRenderer.setZoomEnabled(false, false);
+        mRenderer.setZoomEnabled(false,false);
 
         //titulos
         mRenderer.setXTitle("\n \n Tiempo (Minutos)");
@@ -57,24 +60,28 @@ public class LineGraph {
 
         //Establece los Rangos
         double[] d = new double[4];
-        d[0] = 0.0; //minX
-        d[1] = 2700.0; //maxX
-        d[2] = 0.0; //minY
-        d[3] = 150.0; //maxY
+        d[0]=0.0; //minX
+        d[1]=2700.0; //maxX
+        d[2]=0.0; //minY
+        d[3]=100.0; //maxY
         mRenderer.setRange(d);
         mRenderer.setPanLimits(d);
 
         mRenderer.setXLabels(0);
         mRenderer.setYLabels(0);
 
-        for (int i = 0; i <= 45; i++) {
-            mRenderer.addXTextLabel(i * 60, "" + i);
+        for(int i = 0; i<=45 ;i++){
+            mRenderer.addXTextLabel(i*60 ,""+ i);
         }
-        for (int i = 0; i <= 15; i++) {
-            mRenderer.addYTextLabel(i * 10, "" + i * 10);
+        for(int i = 0; i<=10 ;i++){
+            mRenderer.addYTextLabel(i*10 ,""+ i*10);
         }
 
         //mRenderer.removeXTextLabel(1000);
+
+
+
+
 
 
         //switch (getResources().getDisplayMetrics().densityDpi) {
@@ -107,16 +114,19 @@ public class LineGraph {
         //}
 
 
+
         // Add single renderer to multiple renderer
         mRenderer.addSeriesRenderer(renderer);
     }
 
-    public GraphicalView getView(Context context) {
-        view = ChartFactory.getLineChartView(context, mDataset, mRenderer);
+    public GraphicalView getView(Context context)
+    {
+        view =  ChartFactory.getLineChartView(context, mDataset, mRenderer);
         return view;
     }
 
-    public void addNewPoints(Point p) {
+    public void addNewPoints(Point p)
+    {
         dataset.add(p.getX(), p.getY());
     }
 

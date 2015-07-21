@@ -28,29 +28,35 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import java.nio.ByteBuffer;
 
 
-public class main extends Activity implements Runnable {
+public class main extends Activity implements Runnable
+{
 
     private static final int CMD_LED_OFF = 2;
     private static final int CMD_LED_ON = 1;
 
     ToggleButton buttonLed;
     TextView texto;
-    String muestra = "0";
-    int temperatura = 0;
+    String muestra="0";
+    int temperatura=0;
 
-    boolean rele = true;
+    boolean rele= true;
 
 
-    int tMAx = 0;
+    int tMAx=0;
     private static EditText tMaxText;
 
     /* variables algoritmo de control de temperatura;
      */
     public static final int GRADOS_MAXIMOS = 180;//grados maximos del servo = 220 volts.
     public static final int GRADOS_MINIMOS = 0;//grados minimos del servo = 0 volts.
-    public static int delay = 30;//segundo de espera para continuar con el algoritmo
-    public int grados_motor = 0;// informacion que se le enviara al arduino para controlar el voltaje conforme
-    //a la medicion de temperatura.
+    public static int delay= 30;//segundo de espera para continuar con el algoritmo
+    public int grados_motor=180;// informacion que se le enviara al arduino para controlar el voltaje conforme a la medicion de temperatura.
+    public int t_m_a_a=40;//temperatura maxima a alcanzar;
+    public int grado_anterior=0;
+    public int grado_ahora=180;
+
+
+
 
 
     // Crear un par de conjuntos de valores de y para trazar:
@@ -71,17 +77,16 @@ public class main extends Activity implements Runnable {
 
     protected PowerManager.WakeLock wakelock;
 
-    /**
-     * Called when the activity is first created.
-     */
+    /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
 
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        buttonLed = (ToggleButton) findViewById(R.id.arduinoled);
+        buttonLed = (ToggleButton)findViewById(R.id.arduinoled);
         texto = (TextView) findViewById(R.id.texto);
         prueba = (LinearLayout) findViewById(R.id.grafico);
 
@@ -92,28 +97,27 @@ public class main extends Activity implements Runnable {
         prueba.addView(view);
         this.onClickTexto();
 
-        buttonLed.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+        buttonLed.setOnCheckedChangeListener(new OnCheckedChangeListener(){
             @Override
             public void onCheckedChanged(CompoundButton buttonView,
                                          boolean isChecked) {
-                if (isChecked) {
+                if(isChecked){
                     sendCommand(CMD_LED_ON);
-                } else {
+                }else{
                     sendCommand(CMD_LED_OFF);
                 }
-            }
-        });
+            }});
 
-        usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
+        usbManager = (UsbManager)getSystemService(Context.USB_SERVICE);
 
-        final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        this.wakelock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "etiqueta");
+        final PowerManager pm=(PowerManager)getSystemService(Context.POWER_SERVICE);
+        this.wakelock=pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "etiqueta");
         wakelock.acquire();
 
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onDestroy(){
         super.onDestroy();
 
         this.wakelock.release();
@@ -126,7 +130,7 @@ public class main extends Activity implements Runnable {
         Intent intent = getIntent();
         String action = intent.getAction();
 
-        UsbDevice device = (UsbDevice) intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+        UsbDevice device = (UsbDevice)intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
         if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
             setDevice(device);
         } else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
@@ -196,55 +200,89 @@ public class main extends Activity implements Runnable {
 
             if (usbDeviceConnection != null) {
                 byte[] message = new byte[1];
-                message[0] = (byte) control;
+                message[0] = (byte)control;
                 usbDeviceConnection.bulkTransfer(endpointOut,
                         message, message.length, 0);
             }
         }
     }
 
-    public void onClickTexto() {
-        thread = new Thread() {
+    public void onClickTexto()
+    {
+        thread = new Thread()
+        {
             @Override
-            public void run() {
+            public void run()
+            {
                 int tiempo = 1;
-                int grados = 0;
+                int grados=0;
                 while (true) {
                     try {
                         Thread.sleep(1000);
                         tMAx = Integer.parseInt(tMaxText.getText().toString());
-                        texto.setText("Temperatura: " + muestra + " grados C" + " MAX: " + tMAx + " dasad: " + tMaxText.getText().toString());
+                        texto.setText("Temperatura: " + muestra + " grados C" + " MAX: " + tMAx +" grados: " + grado_ahora);
 
 
                     } catch (Exception e) {
                     }
 
                     try {
-                        Point p = MockData.getDataFromReceiver(tiempo, temperatura); // We got new data!
-                        line.addNewPoints(p); // Add it to our graph
-                        view.repaint();
-
-                        /*
-                        if(temperatura> tMAx && !rele)
+                        if(temperatura>=0)
                         {
-                            sendCommand(CMD_LED_OFF);
-                            rele = true;
+                            Point p = MockData.getDataFromReceiver(tiempo,temperatura); // We got new data!
+                            line.addNewPoints(p); // Add it to our graph
+                            view.repaint();
                         }
 
-                        if (temperatura< tMAx && rele)
-                        {
-                            sendCommand(tiempo);
-                            rele= false;
-                        }*/
-
-
-                    } catch (Exception e) {
-                    }
+                    }catch (Exception e){}
 
                     //servo motor
-                    if (tiempo % 120 == 0) {
-                        grados += 20;
+                    /*funciona con esto asta el asd7.
+                    if(tiempo%120==0)
+                    {
+                        grados+=20;
                         sendCommand(grados);
+                    }
+                     */
+
+                    /*
+                    algoritmo de control de temperatura.
+                     */
+                    int aux=0;
+                    if(tiempo%delay==0 && tiempo>1)
+                    {
+                        if(grado_anterior>grado_ahora)
+                        {
+                            aux= grado_anterior-grado_ahora;
+
+                        }
+                        else
+                        {
+                            aux=grado_ahora-grado_anterior;
+                        }
+                        aux= aux/2;
+
+                        if(temperatura < t_m_a_a)
+                        {
+                            aux=grado_ahora+aux;
+                        }
+                        else
+                        {
+                            if(temperatura>t_m_a_a)
+                            {
+                                aux=grado_ahora-aux;
+                            }
+                        }
+                        grado_anterior=grado_ahora;
+                        grado_ahora=aux;
+                        sendCommand(grado_ahora);
+                    }
+                    else
+                    {
+                        if(tiempo==0)
+                        {
+                            sendCommand(grado_ahora);
+                        }
                     }
 
 
@@ -267,8 +305,9 @@ public class main extends Activity implements Runnable {
             if (usbDeviceConnection.requestWait() == request) {
                 byte rxCmd = buffer.get(0);
 
-                if (rxCmd != 0) {
-                    muestra = "" + rxCmd;
+                if(rxCmd!=0)
+                {
+                    muestra =""+rxCmd;
                     temperatura = (int) rxCmd;
                 }
 
@@ -283,6 +322,12 @@ public class main extends Activity implements Runnable {
         }
 
     }
+
+
+
+
+
+
 
 
 }
