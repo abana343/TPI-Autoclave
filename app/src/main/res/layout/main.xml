@@ -17,13 +17,6 @@
         android:background="#fffafafa"
         android:weightSum="1">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="grafico 2"
-            android:id="@+id/button"
-            android:onClick="onClickButtonIrgrafico" />
-
         <ToggleButton
             android:id="@+id/arduinoled"
             android:layout_width="wrap_content"
@@ -32,17 +25,12 @@
             android:textOff="OFF" />
 
         <TextView
+            android:id="@+id/texto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="T. Máxima"
-            android:id="@+id/textView" />
-
-        <EditText
-            android:layout_width="127dp"
-            android:layout_height="wrap_content"
-            android:inputType="number"
-            android:ems="10"
-            android:id="@+id/tMax" />
+            android:text="N"
+            android:textSize="14dp"
+            android:layout_weight="0.75" />
 
     </LinearLayout>
 
@@ -53,13 +41,6 @@
         android:background="#fffafafa"
         android:weightSum="1">
 
-        <TextView
-            android:id="@+id/texto"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="N"
-            android:textSize="14dp"
-            android:layout_weight="0.75" />
     </LinearLayout>
 
     <LinearLayout
