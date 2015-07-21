@@ -46,6 +46,7 @@ public class LineGraph {
         renderer.setColor(Color.RED);
         renderer.setPointStyle(PointStyle.CIRCLE);
         renderer.setFillPoints(true);
+
     }
 
     private void setRangoGrafico(int tiempoMax, int temperaturaMax)
@@ -60,12 +61,15 @@ public class LineGraph {
 
         mRenderer.setXLabels(0);
         mRenderer.setYLabels(0);
+        mRenderer.setYLabelsPadding(20);
+        mRenderer.setYLabelsAlign(Paint.Align.LEFT);
+
 
         for(int i = 0; i<=tiempoMax ;i++){
             mRenderer.addXTextLabel(i*60 ,""+ i);
         }
-        for(int i = 0; i<= (temperaturaMax* 0.2/10) ;i++){
-            mRenderer.addYTextLabel(i*10 ,""+ i*10);
+        for(int i = 1; i<= (( temperaturaMax + temperaturaMax* 0.2)/5) ;i++){
+            mRenderer.addYTextLabel(i*5 ,""+ i*5);
         }
 
     }
@@ -86,7 +90,6 @@ public class LineGraph {
         //titulos
         mRenderer.setXTitle("\n \n Tiempo (Minutos)");
         mRenderer.setYTitle("Temperatura (grados Celcius)\n \n.");
-
 
         mRenderer.setAxisTitleTextSize(12);
         mRenderer.setLabelsColor(Color.BLACK);

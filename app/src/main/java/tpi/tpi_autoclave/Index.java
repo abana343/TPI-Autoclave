@@ -1,17 +1,26 @@
 package tpi.tpi_autoclave;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
 
 
 public class Index extends ActionBarActivity {
-
+    EditText editTextTiempo;
+    EditText editTextTemperatura;
+    EditText editTextPeriodo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_index);
+
+        editTextTiempo = (EditText) findViewById(R.id.Tiempo);
+        editTextTemperatura = (EditText) findViewById(R.id.Temperatura);
+        editTextPeriodo = (EditText) findViewById(R.id.Periodo);
     }
 
 
@@ -36,4 +45,16 @@ public class Index extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    public void onClickIniciarGraficaSensando(View view){
+        int temperatura = Integer.parseInt( editTextTemperatura.getText().toString());
+        int tiempo = Integer.parseInt( editTextTiempo.getText().toString());
+        int periodo =  Integer.parseInt( editTextPeriodo.getText().toString());
+        Grafico grafico = new Grafico(temperatura,  tiempo, periodo);
+        Comunicador.setObject(grafico);
+        Intent i = new Intent(this, main.class);
+        startActivity(i);
+
+    }
+
 }

@@ -72,16 +72,19 @@ public class main extends Activity implements Runnable
     //-------------------------------------------
     private static GraphicalView view;
     private static LinearLayout prueba;
-    private LineGraph line = new LineGraph();
+
+    private LineGraph line;
     private static Thread thread;
 
     protected PowerManager.WakeLock wakelock;
+    //-----------------
+    Grafico grafico;
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
-
+        grafico = (Grafico)Comunicador.getObjeto();
+        line = new LineGraph(grafico.periodo,grafico.temperatura);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
